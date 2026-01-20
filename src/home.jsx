@@ -1,4 +1,4 @@
-import { Dashboard } from "./Dashboard";
+import { Dashboard } from "./dashboard";
 import {TodoArea} from "./todoarea";
 export function Home(){
 

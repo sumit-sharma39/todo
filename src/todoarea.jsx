@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./todo.css";
-import { Dashboard } from "./Dashboard";
+import { Dashboard } from "./dashboard";
 import {BASE_URL} from "./config"
 
 export function TodoArea() {
