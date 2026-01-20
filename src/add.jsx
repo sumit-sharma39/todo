@@ -17,7 +17,7 @@ export function TodoArea() {
       .then(res => {
         // Ensure res.data is always an array
         const tasksArray = Array.isArray(res.data) ? res.data : res.data.data || [];
-
+        console.log(" NEW TodoArea.jsx LOADED");
         const formatted = tasksArray.map(task => ({
           ...task,
           bullets: typeof task.bullets === "string" ? JSON.parse(task.bullets) : task.bullets || [],
