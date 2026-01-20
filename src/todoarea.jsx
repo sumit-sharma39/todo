@@ -4,60 +4,46 @@ import axios from "axios";
 import "./todo.css";
 import { Dashboard } from "./dashboard";
 import { BASE_URL } from "./config";
-
+import {HOST_URL } from "./config"
 export function TodoArea() {
   const [tasks, setTasks] = useState([]); 
   const [multiDeleteMode, setMultiDeleteMode] = useState(false); 
   const [selectedTasks, setSelectedTasks] = useState([]);  
   const navigate = useNavigate();  
 
-useEffect(() => {
-  const fetchTasks = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/data`);
+  useEffect(() => {
+  axios
+    .get(`${HOST_URL}/data`)
+    .then(res => {
 
-      // 🔍 Debug once (remove later)
-      console.log("API response:", res.data);
+      const tasksArray = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data?.data)
+        ? res.data.data
+        : [];
 
-      // ✅ Normalize response to array
-      let tasksArray = [];
-
-      if (Array.isArray(res.data)) {
-        tasksArray = res.data;
-      } else if (Array.isArray(res.data?.data)) {
-        tasksArray = res.data.data;
-      }
-
-      const formatted = tasksArray.map(task => {
-        let bullets = [];
-
-        if (typeof task.bullets === "string") {
+      const formatted = tasksArray.map(task => ({
+        ...task,
+        bullets: (() => {
           try {
-            bullets = JSON.parse(task.bullets);
-          } catch (e) {
-            console.warn("Invalid bullets JSON:", task.bullets);
+            if (typeof task.bullets === "string") {
+              return JSON.parse(task.bullets);
+            }
+            return Array.isArray(task.bullets) ? task.bullets : [];
+          } catch {
+            return [];
           }
-        } else if (Array.isArray(task.bullets)) {
-          bullets = task.bullets;
-        }
-
-        return {
-          ...task,
-          bullets,
-          deadline: task.deadline ?? null,
-        };
-      });
+        })(),
+        deadline: task.deadline ?? null,
+      }));
 
       setTasks(formatted);
-    } catch (err) {
+    })
+    .catch(err => {
       console.error("Error fetching tasks:", err);
-      setTasks([]); // prevent UI crash
-    }
-  };
-
-  fetchTasks();
+      setTasks([]);
+    });
 }, []);
-
 
 
   const toggleMultiDeleteMode = () => {
@@ -86,7 +72,7 @@ useEffect(() => {
     }
 
     axios
-      .post(`${BASE_URL}/delete`, { ids: selectedTasks })  // API call to delete
+      .post(`${HOST_URL}/delete`, { ids: selectedTasks })  // API call to delete
       .then(() => {
         setTasks(prev => prev.filter(task => !selectedTasks.includes(task.id)));
         setSelectedTasks([]);
@@ -98,7 +84,7 @@ useEffect(() => {
   // Mark a task as completed
   const updateTaskStatus = async (id) => {
     try {
-      await axios.put(`${BASE_URL}/todo/status`, { id });  
+      await axios.put(`${HOST_URL}/todo/status`, { id });  
       setTasks(prev =>
         prev.map(task =>
           task.id === id ? { ...task, completed: true } : task
@@ -129,7 +115,6 @@ useEffect(() => {
 
   return (
     <div>
-      {/* Dashboard component for delete controls */}
       <Dashboard
         multiDeleteMode={multiDeleteMode}
         onDeleteClick={toggleMultiDeleteMode}
