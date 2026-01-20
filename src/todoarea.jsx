@@ -12,39 +12,52 @@ export function TodoArea() {
   const navigate = useNavigate();  
 
 useEffect(() => {
-  axios
-    .get(`${BASE_URL}/data`)
-    .then(res => {
-      // ✅ Ensure we always have an array
-      const tasksArray = Array.isArray(res.data)
-        ? res.data
-        : Array.isArray(res.data?.data)
-        ? res.data.data
-        : [];
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/data`);
 
-      const formatted = tasksArray.map(task => ({
-        ...task,
-        bullets: (() => {
+      // 🔍 Debug once (remove later)
+      console.log("API response:", res.data);
+
+      // ✅ Normalize response to array
+      let tasksArray = [];
+
+      if (Array.isArray(res.data)) {
+        tasksArray = res.data;
+      } else if (Array.isArray(res.data?.data)) {
+        tasksArray = res.data.data;
+      }
+
+      const formatted = tasksArray.map(task => {
+        let bullets = [];
+
+        if (typeof task.bullets === "string") {
           try {
-            return typeof task.bullets === "string"
-              ? JSON.parse(task.bullets)
-              : Array.isArray(task.bullets)
-              ? task.bullets
-              : [];
-          } catch {
-            return [];
+            bullets = JSON.parse(task.bullets);
+          } catch (e) {
+            console.warn("Invalid bullets JSON:", task.bullets);
           }
-        })(),
-        deadline: task.deadline || null,
-      }));
+        } else if (Array.isArray(task.bullets)) {
+          bullets = task.bullets;
+        }
+
+        return {
+          ...task,
+          bullets,
+          deadline: task.deadline ?? null,
+        };
+      });
 
       setTasks(formatted);
-    })
-    .catch(err => {
+    } catch (err) {
       console.error("Error fetching tasks:", err);
-      setTasks([]); // prevent frontend crash
-    });
+      setTasks([]); // prevent UI crash
+    }
+  };
+
+  fetchTasks();
 }, []);
+
 
 
   const toggleMultiDeleteMode = () => {
