@@ -4,7 +4,7 @@ import axios from "axios";
 import "./todo.css";
 import { Dashboard } from "./dashboard";
 import { BASE_URL } from "./config";
-import {HOST_URL } from "./config"
+// import {HOST_URL } from "./config";
 export function TodoArea() {
   const [tasks, setTasks] = useState([]); 
   const [multiDeleteMode, setMultiDeleteMode] = useState(false); 
@@ -13,7 +13,7 @@ export function TodoArea() {
 
   useEffect(() => {
   axios
-    .get(`${HOST_URL}/data`)
+    .get(`${BASE_URL}/data`)
     .then(res => {
 
       const tasksArray = Array.isArray(res.data)
@@ -72,7 +72,7 @@ export function TodoArea() {
     }
 
     axios
-      .post(`${HOST_URL}/delete`, { ids: selectedTasks })  // API call to delete
+      .post(`${BASE_URL}/delete`, { ids: selectedTasks })  // API call to delete
       .then(() => {
         setTasks(prev => prev.filter(task => !selectedTasks.includes(task.id)));
         setSelectedTasks([]);
@@ -84,7 +84,7 @@ export function TodoArea() {
   // Mark a task as completed
   const updateTaskStatus = async (id) => {
     try {
-      await axios.put(`${HOST_URL}/todo/status`, { id });  
+      await axios.put(`${BASE_URL}/todo/status`, { id });  
       setTasks(prev =>
         prev.map(task =>
           task.id === id ? { ...task, completed: true } : task

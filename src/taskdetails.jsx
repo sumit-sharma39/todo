@@ -16,7 +16,7 @@ export function TaskDetail() {
   useEffect(() => {
     async function fetchTask() {
       try {
-        const response = await axios.get(`${HOST_URL}/todo/${id}`);
+        const response = await axios.get(`${BASE_URL}/todo/${id}`);
         const data = response.data;
 
         let bullets = [];

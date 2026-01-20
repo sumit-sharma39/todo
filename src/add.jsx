@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./add.css";
 import { BASE_URL } from "./config"
-import {HOST_URL} from "./config"
+// import {HOST_URL} from "./config";
 
 export function Add({ setTasks }) {
   const [title, setTitle] = useState("");
@@ -26,7 +26,7 @@ export function Add({ setTasks }) {
   console.log("save task is called");
 
   try {
-    const response = await axios.post(`${HOST_URL}/add`, {
+    const response = await axios.post(`${BASE_URL}/add`, {
       title,
       description,
       bullets,
@@ -44,7 +44,7 @@ export function Add({ setTasks }) {
       console.log(formData);
         console.log("FormData entries:", Array.from(formData.entries()));
       await axios.post(
-        `${HOST_URL}/todo/${savedTask.id}/images`,
+        `${BASE_URL}/todo/${savedTask.id}/images`,
         formData
       );
       console.log("Images uploaded successfully");
