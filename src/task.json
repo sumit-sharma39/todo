@@ -1,0 +1,28 @@
+{
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Build To-Do Dashboard",
+      "description": "Create a clean dashboard layout for the app",
+      "bullets": [
+        "Header with title",
+        "Add button",
+        "Responsive layout"
+      ],
+      "completed": false
+
+    },
+    {
+      "id": "task-2",
+      "title": "Implement Task Cards",
+      "description": "Display tasks as grid cards",
+      "bullets": [
+        "Header with title",
+        "Add button",
+        "Responsive layout"
+      ],
+      "completed": false
+
+    }
+  ]
+}

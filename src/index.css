@@ -1,0 +1,71 @@
+.Dashboard {
+    height: 15vh;
+    background-color: rgb(106, 161, 245);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+}
+
+/* Title */
+.Dashboard h1 {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Button container */
+.dashboard-buttons {
+    margin-left: auto;
+    display: flex;
+    gap: 14px;
+}
+
+/* Shared button styles */
+.edit-btn {
+    background-color: rgb(135, 221, 255);
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+
+    border: none;
+    text-decoration: none;
+    color: #000;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    transition: background-color 0.2s ease,
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+}
+
+.edit-btn:hover {
+    background-color: rgb(90, 190, 230);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.edit-btn:active {
+    transform: scale(0.97);
+}
+
+/* Add icon */
+.Add-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* Add button link fix */
+.link-add {
+    text-decoration: none;
+}
+
+/* Delete button emphasis */
+.delete-btn {
+    background-color: rgb(255, 160, 160);
+}
+
+.delete-btn:hover {
+    background-color: rgb(235, 120, 120);
+}
