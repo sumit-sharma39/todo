@@ -12,33 +12,66 @@ export function TodoArea() {
   const navigate = useNavigate();
 
   useEffect(() => {
-  axios.get(`${BASE_URL}/data`).then(res => {
-    console.log("RAW API RESPONSE", res.data);
+    axios
+      .get(`${BASE_URL}/data`)
+      .then((res) => {
+        console.log("RAW API RESPONSE", res.data);
 
-    // Adjust this according to your API structure
-    const tasksArray = Array.isArray(res.data) ? res.data : res.data.data || [];
+        const tasksArray = Array.isArray(res.data) ? res.data : res.data.data || [];
 
-    const formatted = tasksArray.map(task => ({
-      ...task,
-      id: task.id || task._id,
-      bullets: Array.isArray(task.bullets)
-        ? task.bullets
-        : typeof task.bullets === "string"
-        ? (() => {
-            try { return JSON.parse(task.bullets) } catch { return [] }
-          })()
-        : [],
-      deadline: task.deadline || null,
-    }));
+        const formatted = tasksArray.map((task) => {
+          // Parse bullets
+          let bullets = [];
+          if (Array.isArray(task.bullets)) {
+            bullets = task.bullets;
+          } else if (typeof task.bullets === "string") {
+            try {
+              bullets = JSON.parse(task.bullets);
+            } catch {
+              // Handle Postgres array literal: "{item1,item2}"
+              if (task.bullets.startsWith("{") && task.bullets.endsWith("}")) {
+                bullets = task.bullets
+                  .slice(1, -1)
+                  .split(",")
+                  .map((s) => s.trim().replace(/"/g, ""));
+              } else {
+                bullets = task.bullets ? [task.bullets] : [];
+              }
+            }
+          }
 
-    console.log("FORMATTED TASKS", formatted);
-    setTasks(formatted);
-  }).catch(err => {
-    console.error("Error fetching tasks:", err);
-    setTasks([]);
-  });
-}, []);
+          // Parse images
+          let images = [];
+          if (Array.isArray(task.images)) {
+            images = task.images.filter(url => typeof url === 'string' && url.trim().startsWith('http'));
+          } else if (typeof task.images === "string") {
+            // Handle Postgres array literal: "{url1,url2}"
+            if (task.images.startsWith("{") && task.images.endsWith("}")) {
+              images = task.images
+                .slice(1, -1)
+                .split(",")
+                .map((s) => s.trim().replace(/"/g, ""))
+                .filter(url => url.startsWith('http'));
+            }
+          }
 
+          return {
+            ...task,
+            id: task.id || task._id,
+            bullets,
+            images,
+            deadline: task.deadline || null,
+          };
+        });
+
+        console.log("FORMATTED TASKS", formatted);
+        setTasks(formatted);
+      })
+      .catch((err) => {
+        console.error("Error fetching tasks:", err);
+        setTasks([]);
+      });
+  }, []);
 
   const toggleMultiDeleteMode = () => {
     setMultiDeleteMode(true);
@@ -50,10 +83,10 @@ export function TodoArea() {
     setSelectedTasks([]);
   };
 
-  const toggleSelectTask = id => {
-    setSelectedTasks(prev =>
+  const toggleSelectTask = (id) => {
+    setSelectedTasks((prev) =>
       prev.includes(id)
-        ? prev.filter(taskId => taskId !== id)
+        ? prev.filter((taskId) => taskId !== id)
         : [...prev, id]
     );
   };
@@ -75,16 +108,16 @@ export function TodoArea() {
         }
       )
       .then(() => {
-        setTasks(prev =>
-          prev.filter(task => !selectedTasks.includes(task.id))
+        setTasks((prev) =>
+          prev.filter((task) => !selectedTasks.includes(task.id))
         );
         setSelectedTasks([]);
         setMultiDeleteMode(false);
       })
-      .catch(err => console.error("Error deleting tasks:", err));
+      .catch((err) => console.error("Error deleting tasks:", err));
   };
 
-  const updateTaskStatus = async id => {
+  const updateTaskStatus = async (id) => {
     try {
       await axios.put(
         `${BASE_URL}/todo/status`,
@@ -96,8 +129,8 @@ export function TodoArea() {
         }
       );
 
-      setTasks(prev =>
-        prev.map(task =>
+      setTasks((prev) =>
+        prev.map((task) =>
           task.id === id ? { ...task, completed: true } : task
         )
       );
@@ -106,7 +139,7 @@ export function TodoArea() {
     }
   };
 
-  const formatDate = date => {
+  const formatDate = (date) => {
     if (!date) return "";
     const d = new Date(date);
     if (isNaN(d)) return "";
@@ -120,7 +153,7 @@ export function TodoArea() {
   const isOverdue = (deadline, completed) =>
     deadline && !completed && new Date(deadline) < new Date();
 
-  const openTaskDetail = id => {
+  const openTaskDetail = (id) => {
     navigate(`/task/${id}`);
   };
 
@@ -134,7 +167,7 @@ export function TodoArea() {
       />
 
       <div className="TodoGrid">
-        {tasks.map(task => (
+        {tasks.map((task) => (
           <div
             key={task.id}
             className={`TodoCard ${task.completed ? "completed" : ""} ${
@@ -149,7 +182,7 @@ export function TodoArea() {
                 <input
                   type="checkbox"
                   checked={selectedTasks.includes(task.id)}
-                  onClick={e => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                   onChange={() => toggleSelectTask(task.id)}
                 />
               )}
@@ -159,9 +192,7 @@ export function TodoArea() {
               {task.deadline && (
                 <p
                   className={`task-deadline ${
-                    isOverdue(task.deadline, task.completed)
-                      ? "overdue"
-                      : ""
+                    isOverdue(task.deadline, task.completed) ? "overdue" : ""
                   }`}
                 >
                   Deadline: <strong>{formatDate(task.deadline)}</strong>
@@ -169,9 +200,7 @@ export function TodoArea() {
               )}
             </div>
 
-            {task.description && (
-              <p className="task-desc">{task.description}</p>
-            )}
+            {task.description && <p className="task-desc">{task.description}</p>}
 
             {task.bullets?.length > 0 && (
               <ul className="task-bullets">
@@ -181,10 +210,25 @@ export function TodoArea() {
               </ul>
             )}
 
+            {/* ✅ Render image thumbnails */}
+            {task.images && task.images.length > 0 && (
+              <div className="task-images-preview">
+                {task.images.slice(0, 3).map((url, idx) => (
+                  <img
+                    key={idx}
+                    src={url}
+                    alt={`Preview ${idx + 1}`}
+                    className="task-image-thumb"
+                    onError={(e) => (e.target.style.display = "none")}
+                  />
+                ))}
+              </div>
+            )}
+
             <button
               className="complete-btn"
               disabled={task.completed}
-              onClick={e => {
+              onClick={(e) => {
                 e.stopPropagation();
                 updateTaskStatus(task.id);
               }}

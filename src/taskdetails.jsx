@@ -17,18 +17,43 @@ export function TaskDetail() {
         const response = await axios.get(`${BASE_URL}/todo/${id}`);
         const data = response.data;
 
+        // Normalize bullets
         let bullets = [];
         if (typeof data.bullets === "string") {
           try {
             bullets = JSON.parse(data.bullets);
           } catch {
-            bullets = [];
+            bullets = data.bullets ? [data.bullets] : [];
           }
         } else if (Array.isArray(data.bullets)) {
           bullets = data.bullets;
         }
 
-        const images = Array.isArray(data.images) ? data.images : [];
+        // Normalize images: ensure it's an array of valid URLs
+        let images = [];
+        if (Array.isArray(data.images)) {
+          images = data.images.filter(
+            url => typeof url === 'string' && url.trim().startsWith('http')
+          );
+        } else if (typeof data.images === "string") {
+          // Handle case where backend sends "{url1,url2}" (Postgres array literal)
+          try {
+            // Try JSON first
+            const parsed = JSON.parse(data.images);
+            if (Array.isArray(parsed)) {
+              images = parsed.filter(url => typeof url === 'string' && url.startsWith('http'));
+            }
+          } catch {
+            // Try Postgres literal format: {url1,url2}
+            const match = data.images.match(/^\{(.*)\}$/);
+            if (match) {
+              images = match[1]
+                .split(',')
+                .map(s => s.trim().replace(/"/g, ''))
+                .filter(url => url.startsWith('http'));
+            }
+          }
+        }
 
         setTask({
           title: data.title || "Untitled Task",
@@ -60,8 +85,8 @@ export function TaskDetail() {
     });
   }
 
-  if (loading) return <p>Loading task...</p>;
-  if (error) return <p>Unable to load task.</p>;
+  if (loading) return <p className="loading">Loading task...</p>;
+  if (error) return <p className="error">Unable to load task.</p>;
   if (!task) return null;
 
   return (
@@ -92,9 +117,11 @@ export function TaskDetail() {
             <img
               key={index}
               src={img}
-              alt={`task-${index}`}
+              alt={`Task image ${index + 1}`}
               className="task-image"
-              onError={(e) => (e.target.style.display = "none")}
+              onError={(e) => {
+                e.target.style.display = "none";
+              }}
             />
           ))}
         </div>
