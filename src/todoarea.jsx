@@ -3,69 +3,69 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./todo.css";
 import { Dashboard } from "./dashboard";
-import { BASE_URL } from "./config";
-
+import { HOST_URL, BASE_URL } from "./config";
 
 export function TodoArea() {
-
-  console.log("hllo world")
-  const [tasks, setTasks] = useState([]); 
-  const [multiDeleteMode, setMultiDeleteMode] = useState(false); 
-  const [selectedTasks, setSelectedTasks] = useState([]);  
-  const navigate = useNavigate();  
+  const [tasks, setTasks] = useState([]);
+  const [multiDeleteMode, setMultiDeleteMode] = useState(false);
+  const [selectedTasks, setSelectedTasks] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("hello work");
-      axios.get(`${BASE_URL}/data`)
+    axios
+      .get(`${HOST_URL}/data`, {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      })
       .then(res => {
         console.log("API RESPONSE", res.data);
-      const tasksArray = Array.isArray(res.data)
-        ? res.data
-        : Array.isArray(res.data?.data)
-        ? res.data.data
-        : [];
 
-      const formatted = tasksArray.map(task => ({
-        ...task,
-        id: task.id || task._id,
-        bullets: (() => {
-          try {
-            if (typeof task.bullets === "string") {
-              return JSON.parse(task.bullets);
+        const tasksArray = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.data)
+          ? res.data.data
+          : [];
+
+        const formatted = tasksArray.map(task => ({
+          ...task,
+          id: task.id || task._id,
+          bullets: (() => {
+            try {
+              if (typeof task.bullets === "string") {
+                return JSON.parse(task.bullets);
+              }
+              return Array.isArray(task.bullets) ? task.bullets : [];
+            } catch {
+              return [];
             }
-            return Array.isArray(task.bullets) ? task.bullets : [];
-          } catch {
-            return [];
-          }
-        })(),
-        deadline: task.deadline ?? null,
-      }));
+          })(),
+          deadline: task.deadline ?? null,
+        }));
 
-      setTasks(formatted);
-    })
-    .catch(err => {
-      console.error("Error fetching tasks:", err);
-      setTasks([]);
-    });
-}, []);
-
+        setTasks(formatted);
+      })
+      .catch(err => {
+        console.error("Error fetching tasks:", err);
+        setTasks([]);
+      });
+  }, []);
 
   const toggleMultiDeleteMode = () => {
     setMultiDeleteMode(true);
-    setSelectedTasks([]);  
+    setSelectedTasks([]);
   };
-
 
   const cancelMultiDeleteMode = () => {
     setMultiDeleteMode(false);
-    setSelectedTasks([]);  
+    setSelectedTasks([]);
   };
 
-  const toggleSelectTask = (id) => {
+  const toggleSelectTask = id => {
     setSelectedTasks(prev =>
       prev.includes(id)
-        ? prev.filter(taskId => taskId !== id)  
-        : [...prev, id]  
+        ? prev.filter(taskId => taskId !== id)
+        : [...prev, id]
     );
   };
 
@@ -76,19 +76,37 @@ export function TodoArea() {
     }
 
     axios
-      .post(`${BASE_URL}/delete`, { ids: selectedTasks })  // API call to delete
+      .post(
+        `${BASE_URL}/delete`,
+        { ids: selectedTasks },
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      )
       .then(() => {
-        setTasks(prev => prev.filter(task => !selectedTasks.includes(task.id)));
+        setTasks(prev =>
+          prev.filter(task => !selectedTasks.includes(task.id))
+        );
         setSelectedTasks([]);
         setMultiDeleteMode(false);
       })
       .catch(err => console.error("Error deleting tasks:", err));
   };
 
-  // Mark a task as completed
-  const updateTaskStatus = async (id) => {
+  const updateTaskStatus = async id => {
     try {
-      await axios.put(`${BASE_URL}/todo/status`, { id });  
+      await axios.put(
+        `${BASE_URL}/todo/status`,
+        { id },
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
+      );
+
       setTasks(prev =>
         prev.map(task =>
           task.id === id ? { ...task, completed: true } : task
@@ -99,10 +117,10 @@ export function TodoArea() {
     }
   };
 
-  const formatDate = (date) => {
+  const formatDate = date => {
     if (!date) return "";
     const d = new Date(date);
-    if (isNaN(d)) return "";  // Invalid date check
+    if (isNaN(d)) return "";
     return d.toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
@@ -113,7 +131,7 @@ export function TodoArea() {
   const isOverdue = (deadline, completed) =>
     deadline && !completed && new Date(deadline) < new Date();
 
-  const openTaskDetail = (id) => {
+  const openTaskDetail = id => {
     navigate(`/task/${id}`);
   };
 
@@ -130,9 +148,10 @@ export function TodoArea() {
         {tasks.map(task => (
           <div
             key={task.id}
-            className={`TodoCard ${task.completed ? "completed" : ""} ${selectedTasks.includes(task.id) ? "selected" : ""}`}
+            className={`TodoCard ${task.completed ? "completed" : ""} ${
+              selectedTasks.includes(task.id) ? "selected" : ""
+            }`}
             onClick={() => {
-
               if (!multiDeleteMode) openTaskDetail(task.id);
             }}
           >
@@ -141,7 +160,7 @@ export function TodoArea() {
                 <input
                   type="checkbox"
                   checked={selectedTasks.includes(task.id)}
-                  onClick={(e) => e.stopPropagation()} 
+                  onClick={e => e.stopPropagation()}
                   onChange={() => toggleSelectTask(task.id)}
                 />
               )}
@@ -149,26 +168,35 @@ export function TodoArea() {
               <h3>{task.title}</h3>
 
               {task.deadline && (
-                <p className={`task-deadline ${isOverdue(task.deadline, task.completed) ? "overdue" : ""}`}>
+                <p
+                  className={`task-deadline ${
+                    isOverdue(task.deadline, task.completed)
+                      ? "overdue"
+                      : ""
+                  }`}
+                >
                   Deadline: <strong>{formatDate(task.deadline)}</strong>
                 </p>
               )}
             </div>
 
+            {task.description && (
+              <p className="task-desc">{task.description}</p>
+            )}
 
-            {task.description && <p className="task-desc">{task.description}</p>}
-
-            {task.bullets && task.bullets.length > 0 && (
+            {task.bullets?.length > 0 && (
               <ul className="task-bullets">
-                {task.bullets.map((bullet, index) => <li key={index}>{bullet}</li>)}
+                {task.bullets.map((bullet, index) => (
+                  <li key={index}>{bullet}</li>
+                ))}
               </ul>
             )}
 
             <button
               className="complete-btn"
               disabled={task.completed}
-              onClick={(e) => {
-                e.stopPropagation();  // Prevent triggering card click
+              onClick={e => {
+                e.stopPropagation();
                 updateTaskStatus(task.id);
               }}
             >
