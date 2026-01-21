@@ -12,10 +12,9 @@ export function TodoArea() {
   const navigate = useNavigate();  
 
   useEffect(() => {
-  axios
-    .get(`${BASE_URL}/data`)
-    .then(res => {
-
+      axios.get(`${BASE_URL}/data`)
+      .then(res => {
+        console.log("API RESPONSE", res.data);
       const tasksArray = Array.isArray(res.data)
         ? res.data
         : Array.isArray(res.data?.data)
@@ -24,6 +23,7 @@ export function TodoArea() {
 
       const formatted = tasksArray.map(task => ({
         ...task,
+        id: task.id || task._id,
         bullets: (() => {
           try {
             if (typeof task.bullets === "string") {
