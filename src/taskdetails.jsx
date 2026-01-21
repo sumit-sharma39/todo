@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./taskdetail.css";
-import { BASE_URL } from "./config";
+import { HOST_URL , BASE_URL } from "./config";
 
 export function TaskDetail() {
   const { id } = useParams();
@@ -14,7 +14,7 @@ export function TaskDetail() {
   useEffect(() => {
     async function fetchTask() {
       try {
-        const response = await axios.get(`${BASE_URL}/todo/${id}`);
+        const response = await axios.get(`${HOST_URL}/todo/${id}`);
         const data = response.data;
 
         // Normalize bullets

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./add.css";
-import { BASE_URL } from "./config";
+import {HOST_URL , BASE_URL } from "./config";
 
 export function Add({ setTasks }) {
   const [title, setTitle] = useState("");
@@ -24,7 +24,11 @@ export function Add({ setTasks }) {
     if (!title.trim()) return;
 
     try {
-      const response = await axios.post(`${BASE_URL}/add`, {
+
+      // send images to cloudinary and get url
+      // send the list of url to /add (images)
+
+      const response = await axios.post(`${HOST_URL}/add`, {
         title,
         description,
         bullets,
@@ -40,7 +44,7 @@ export function Add({ setTasks }) {
         images.forEach((img) => formData.append("images", img));
 
         const imgResponse = await axios.post(
-          `${BASE_URL}/todo/${savedTask.id}/images`,
+          `${HOST_URL}/todo/${savedTask.id}/images`,
           formData
         );
 
@@ -102,6 +106,7 @@ export function Add({ setTasks }) {
         </ul>
       )}
 
+      {/*<<<<<<--------------------change this for the input of the image ---------------------->>> */}
       <input
         type="file"
         accept="image/*"

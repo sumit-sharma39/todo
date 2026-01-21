@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./todo.css";
 import { Dashboard } from "./dashboard";
-import { BASE_URL } from "./config";
+import { HOST_URL , BASE_URL } from "./config";
 
 export function TodoArea() {
   const [tasks, setTasks] = useState([]);
@@ -11,66 +11,15 @@ export function TodoArea() {
   const [selectedTasks, setSelectedTasks] = useState([]);
   const navigate = useNavigate();
 
+  
+
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/data`)
-      .then((res) => {
-        console.log("RAW API RESPONSE", res.data);
-
-        const tasksArray = Array.isArray(res.data) ? res.data : res.data.data || [];
-
-        const formatted = tasksArray.map((task) => {
-          // Parse bullets
-          let bullets = [];
-          if (Array.isArray(task.bullets)) {
-            bullets = task.bullets;
-          } else if (typeof task.bullets === "string") {
-            try {
-              bullets = JSON.parse(task.bullets);
-            } catch {
-              // Handle Postgres array literal: "{item1,item2}"
-              if (task.bullets.startsWith("{") && task.bullets.endsWith("}")) {
-                bullets = task.bullets
-                  .slice(1, -1)
-                  .split(",")
-                  .map((s) => s.trim().replace(/"/g, ""));
-              } else {
-                bullets = task.bullets ? [task.bullets] : [];
-              }
-            }
-          }
-
-          // Parse images
-          let images = [];
-          if (Array.isArray(task.images)) {
-            images = task.images.filter(url => typeof url === 'string' && url.trim().startsWith('http'));
-          } else if (typeof task.images === "string") {
-            // Handle Postgres array literal: "{url1,url2}"
-            if (task.images.startsWith("{") && task.images.endsWith("}")) {
-              images = task.images
-                .slice(1, -1)
-                .split(",")
-                .map((s) => s.trim().replace(/"/g, ""))
-                .filter(url => url.startsWith('http'));
-            }
-          }
-
-          return {
-            ...task,
-            id: task.id || task._id,
-            bullets,
-            images,
-            deadline: task.deadline || null,
-          };
-        });
-
-        console.log("FORMATTED TASKS", formatted);
-        setTasks(formatted);
-      })
-      .catch((err) => {
-        console.error("Error fetching tasks:", err);
-        setTasks([]);
-      });
+    const getData = async () =>  {
+    const result = await axios.get(`${HOST_URL}/data`);
+    console.log("DATTTTTTTTTTTTTT",result)
+    setTasks(result.data.data)
+  }
+  getData()
   }, []);
 
   const toggleMultiDeleteMode = () => {
@@ -96,16 +45,10 @@ export function TodoArea() {
       alert("Select at least one task to delete!");
       return;
     }
-
     axios
       .post(
-        `${BASE_URL}/delete`,
-        { ids: selectedTasks },
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
+        `${HOST_URL}/delete`,
+        { ids: selectedTasks }
       )
       .then(() => {
         setTasks((prev) =>
@@ -120,13 +63,8 @@ export function TodoArea() {
   const updateTaskStatus = async (id) => {
     try {
       await axios.put(
-        `${BASE_URL}/todo/status`,
-        { id },
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
+        `${HOST_URL}/todo/status`,
+        { id }
       );
 
       setTasks((prev) =>
@@ -210,7 +148,6 @@ export function TodoArea() {
               </ul>
             )}
 
-            {/* ✅ Render image thumbnails */}
             {task.images && task.images.length > 0 && (
               <div className="task-images-preview">
                 {task.images.slice(0, 3).map((url, idx) => (
