@@ -5,13 +5,17 @@ import "./todo.css";
 import { Dashboard } from "./dashboard";
 import { BASE_URL } from "./config";
 
+
 export function TodoArea() {
+
+  console.log("hllo world")
   const [tasks, setTasks] = useState([]); 
   const [multiDeleteMode, setMultiDeleteMode] = useState(false); 
   const [selectedTasks, setSelectedTasks] = useState([]);  
   const navigate = useNavigate();  
 
   useEffect(() => {
+    console.log("hello work");
       axios.get(`${BASE_URL}/data`)
       .then(res => {
         console.log("API RESPONSE", res.data);
