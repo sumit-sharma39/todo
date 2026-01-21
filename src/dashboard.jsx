@@ -1,35 +1,40 @@
-const database_conn = require("../database/connection");
+import "./index.css";
+import addIcon from "./assets/add-icon.png";
+import { Link } from "react-router-dom";
 
-const AddNewTask = async (req, res) => {
-  try {
-    const { title, description, bullets, deadline, completed, images } = req.body;
+export function Dashboard({
+    multiDeleteMode,
+    onDeleteClick,
+    onDeleteSelected,
+    onCancel
+}) {
 
-    if (!title) {
-      return res.status(400).json({ error: "Title is required" });
-    }
+return (
+    <div className="Dashboard">
+        <h1>To-do list</h1>
 
-    const query = `
-      INSERT INTO todo_data (title, description, bullets, deadline, completed, images)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING *;
-    `;
+        <div className="dashboard-buttons">
+        <Link to="/Add" className="edit-btn link-add">
+            Add
+            <img src={addIcon} alt="add icon" className="Add-icon" />
+        </Link>
 
-    const values = [
-      title,
-      description || "",
-      bullets ? JSON.stringify(bullets) : JSON.stringify([]),
-      deadline || null,
-      completed ?? false,
-      images ? JSON.stringify(images) : JSON.stringify([])
-    ];
+        {multiDeleteMode && (
+            <button
+            className="edit-btn cancel-btn"
+            onClick={onCancel}
+            >
+            Cancel
+            </button>
+        )}
 
-    const result = await database_conn.query(query, values);
-
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error("AddNewTask error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-module.exports = AddNewTask;
+        <button
+            className="edit-btn delete-btn"
+            onClick={multiDeleteMode ? onDeleteSelected : onDeleteClick}
+        >
+            {multiDeleteMode ? "Delete Selected" : "Delete"}
+        </button>
+        </div>
+    </div>
+);
+}
