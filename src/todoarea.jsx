@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./todo.css";
 import { Dashboard } from "./dashboard";
-import { HOST_URL, BASE_URL } from "./config";
+import { BASE_URL } from "./config";
 
 export function TodoArea() {
   const [tasks, setTasks] = useState([]);
@@ -12,44 +12,33 @@ export function TodoArea() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get(`${HOST_URL}/data`, {
-        headers: {
-          "ngrok-skip-browser-warning": "true",
-        },
-      })
-      .then(res => {
-        console.log("API RESPONSE", res.data);
+  axios.get(`${BASE_URL}/data`).then(res => {
+    console.log("RAW API RESPONSE", res.data);
 
-        const tasksArray = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data?.data)
-          ? res.data.data
-          : [];
+    // Adjust this according to your API structure
+    const tasksArray = Array.isArray(res.data) ? res.data : res.data.data || [];
 
-        const formatted = tasksArray.map(task => ({
-          ...task,
-          id: task.id || task._id,
-          bullets: (() => {
-            try {
-              if (typeof task.bullets === "string") {
-                return JSON.parse(task.bullets);
-              }
-              return Array.isArray(task.bullets) ? task.bullets : [];
-            } catch {
-              return [];
-            }
-          })(),
-          deadline: task.deadline ?? null,
-        }));
+    const formatted = tasksArray.map(task => ({
+      ...task,
+      id: task.id || task._id,
+      bullets: Array.isArray(task.bullets)
+        ? task.bullets
+        : typeof task.bullets === "string"
+        ? (() => {
+            try { return JSON.parse(task.bullets) } catch { return [] }
+          })()
+        : [],
+      deadline: task.deadline || null,
+    }));
 
-        setTasks(formatted);
-      })
-      .catch(err => {
-        console.error("Error fetching tasks:", err);
-        setTasks([]);
-      });
-  }, []);
+    console.log("FORMATTED TASKS", formatted);
+    setTasks(formatted);
+  }).catch(err => {
+    console.error("Error fetching tasks:", err);
+    setTasks([]);
+  });
+}, []);
+
 
   const toggleMultiDeleteMode = () => {
     setMultiDeleteMode(true);

@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./add.css";
-import { BASE_URL } from "./config"
-
+import { BASE_URL } from "./config";
 
 export function Add({ setTasks }) {
   const [title, setTitle] = useState("");
@@ -17,74 +16,70 @@ export function Add({ setTasks }) {
 
   function addBullet() {
     if (!bulletInput.trim()) return;
-    setBullets(prev => [...prev, bulletInput]);
+    setBullets((prev) => [...prev, bulletInput]);
     setBulletInput("");
   }
 
   async function saveTask() {
-  if (!title.trim()) return; // Ensure title is not empty
-  console.log("save task is called");
+    if (!title.trim()) return;
 
-  try {
-    const response = await axios.post(`${BASE_URL}/add`, {
-      title,
-      description,
-      bullets,
-      deadline,
-      completed: false
-    });
+    try {
+      const response = await axios.post(`${BASE_URL}/add`, {
+        title,
+        description,
+        bullets,
+        deadline,
+        completed: false,
+      });
 
-    const savedTask = response.data;
+      const savedTask = response.data;
 
-    if (images.length > 0) {
-      const formData = new FormData();
-      images.forEach(img => formData.append("images", img)); 
+      let uploadedImages = [];
+      if (images.length > 0) {
+        const formData = new FormData();
+        images.forEach((img) => formData.append("images", img));
 
-      console.log("Uploading images:", images);
-      console.log(formData);
-        console.log("FormData entries:", Array.from(formData.entries()));
-      await axios.post(
-        `${BASE_URL}/todo/${savedTask.id}/images`,
-        formData
-      );
-      console.log("Images uploaded successfully");
+        const imgResponse = await axios.post(
+          `${BASE_URL}/todo/${savedTask.id}/images`,
+          formData
+        );
+
+        uploadedImages = imgResponse.data.images || [];
+      }
+
+      setTasks((prev) => [
+        ...prev,
+        { ...savedTask, images: uploadedImages },
+      ]);
+      navigate("/");
+    } catch (err) {
+      console.error("Error saving task:", err);
     }
-
-    setTasks(prev => [...prev, savedTask]);
-    navigate("/");
-
-  } catch (err) {
-    console.error("Error saving task:", err);
   }
-}
-
 
   return (
     <div className="AddPage">
       <h2>Add New Task</h2>
 
-
       <input
         className="titlearea"
         placeholder="Task title"
         value={title}
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
       />
-
 
       <textarea
         className="disparea"
         placeholder="Description"
         value={description}
-        onChange={e => setDescription(e.target.value)}
+        onChange={(e) => setDescription(e.target.value)}
       />
-
 
       <input
         type="date"
         className="deadlinearea"
         value={deadline}
-        onChange={e => setDeadline(e.target.value)}
+        onChange={(e) => setDeadline(e.target.value)}
       />
 
       <div className="bullet-row">
@@ -92,11 +87,12 @@ export function Add({ setTasks }) {
           type="text"
           placeholder="Add bullet point"
           value={bulletInput}
-          onChange={e => setBulletInput(e.target.value)}
+          onChange={(e) => setBulletInput(e.target.value)}
         />
-        <button type="button" className="add-btn" onClick={addBullet}>Add</button>
+        <button type="button" className="add-btn" onClick={addBullet}>
+          Add
+        </button>
       </div>
-
 
       {bullets.length > 0 && (
         <ul>
@@ -106,22 +102,17 @@ export function Add({ setTasks }) {
         </ul>
       )}
 
-
       <input
         type="file"
         accept="image/*"
         multiple
-        onChange={e => setImages(Array.from(e.target.files))}
+        onChange={(e) => setImages(Array.from(e.target.files))}
       />
 
       {images.length > 0 && (
         <div className="image-preview">
           {images.map((img, i) => (
-            <img
-              key={i}
-              src={URL.createObjectURL(img)}
-              alt="preview"
-            />
+            <img key={i} src={URL.createObjectURL(img)} alt="preview" />
           ))}
         </div>
       )}

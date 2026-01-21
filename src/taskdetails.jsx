@@ -4,7 +4,6 @@ import axios from "axios";
 import "./taskdetail.css";
 import { BASE_URL } from "./config";
 
-
 export function TaskDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -12,7 +11,6 @@ export function TaskDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // ---------- Fetch task ----------
   useEffect(() => {
     async function fetchTask() {
       try {
@@ -20,7 +18,6 @@ export function TaskDetail() {
         const data = response.data;
 
         let bullets = [];
-
         if (typeof data.bullets === "string") {
           try {
             bullets = JSON.parse(data.bullets);
@@ -31,10 +28,8 @@ export function TaskDetail() {
           bullets = data.bullets;
         }
 
-        // ---------- Handle images safely ----------
         const images = Array.isArray(data.images) ? data.images : [];
 
-        // ---------- Final task object ----------
         setTask({
           title: data.title || "Untitled Task",
           description: data.description || "",
@@ -54,13 +49,10 @@ export function TaskDetail() {
     fetchTask();
   }, [id]);
 
-  // ---------- Date formatter ----------
   function formatDate(date) {
     if (!date) return "";
-
     const parsedDate = new Date(date);
     if (isNaN(parsedDate)) return "";
-
     return parsedDate.toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
@@ -68,12 +60,10 @@ export function TaskDetail() {
     });
   }
 
-  // ---------- UI states ----------
   if (loading) return <p>Loading task...</p>;
   if (error) return <p>Unable to load task.</p>;
   if (!task) return null;
 
-  // ---------- UI ----------
   return (
     <div className="TaskDetailPage">
       <button className="back-btn" onClick={() => navigate(-1)}>
@@ -83,14 +73,10 @@ export function TaskDetail() {
       <h2 className="task-title">{task.title}</h2>
 
       {task.deadline && (
-        <p className="task-deadline">
-          Deadline: {formatDate(task.deadline)}
-        </p>
+        <p className="task-deadline">Deadline: {formatDate(task.deadline)}</p>
       )}
 
-      {task.description && (
-        <p className="task-desc">{task.description}</p>
-      )}
+      {task.description && <p className="task-desc">{task.description}</p>}
 
       {task.bullets.length > 0 && (
         <ul className="task-bullets">
@@ -105,9 +91,10 @@ export function TaskDetail() {
           {task.images.map((img, index) => (
             <img
               key={index}
-              src={`${BASE_URL}${img}`}
-              alt="task"
+              src={img}
+              alt={`task-${index}`}
               className="task-image"
+              onError={(e) => (e.target.style.display = "none")}
             />
           ))}
         </div>
