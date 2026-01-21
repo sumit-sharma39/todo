@@ -4,7 +4,7 @@ import axios from "axios";
 import "./todo.css";
 import { Dashboard } from "./dashboard";
 import { BASE_URL } from "./config";
-// import {HOST_URL } from "./config";
+
 export function TodoArea() {
   const [tasks, setTasks] = useState([]); 
   const [multiDeleteMode, setMultiDeleteMode] = useState(false); 
