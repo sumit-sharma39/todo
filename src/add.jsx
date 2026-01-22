@@ -25,7 +25,7 @@ export function Add({ setTasks }) {
 
     try {
       // only for saving the data of the task 
-    const response = await axios.post(`${HOST_URL}/add`, {
+    const response = await axios.post(`${BASE_URL}/add`, {
         title,
         description,
         bullets,
@@ -42,7 +42,7 @@ export function Add({ setTasks }) {
 
         images.forEach((img) => formData.append("image_url", img));
         const imgResponse = await axios.post(
-          `${HOST_URL}/todo/${savedTask.id}/image_url`,
+          `${BASE_URL}/todo/${savedTask.id}/image_url`,
           formData
         );
 

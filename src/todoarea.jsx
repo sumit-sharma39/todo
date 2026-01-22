@@ -15,7 +15,7 @@ export function TodoArea() {
 
   useEffect(() => {
     const getData = async () =>  {
-    const result = await axios.get(`${HOST_URL}/data`);
+    const result = await axios.get(`${BASE_URL}/data`);
     console.log("DATTTTTTTTTTTTTT",result)
     setTasks(result.data.data)
   }
@@ -47,7 +47,7 @@ export function TodoArea() {
     }
     axios
       .post(
-        `${HOST_URL}/delete`,
+        `${BASE_URL}/delete`,
         { ids: selectedTasks }
       )
       .then(() => {
@@ -63,7 +63,7 @@ export function TodoArea() {
   const updateTaskStatus = async (id) => {
     try {
       await axios.put(
-        `${HOST_URL}/todo/status`,
+        `${BASE_URL}/todo/status`,
         { id }
       );
 
