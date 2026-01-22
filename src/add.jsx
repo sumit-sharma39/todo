@@ -24,11 +24,8 @@ export function Add({ setTasks }) {
     if (!title.trim()) return;
 
     try {
-
-      // send images to cloudinary and get url
-      // send the list of url to /add (images)
-
-      const response = await axios.post(`${HOST_URL}/add`, {
+      // only for saving the data of the task 
+    const response = await axios.post(`${HOST_URL}/add`, {
         title,
         description,
         bullets,
@@ -36,25 +33,26 @@ export function Add({ setTasks }) {
         completed: false,
       });
 
+      //here goes the cloudinary imae url 
       const savedTask = response.data;
-
+      // console.log("savetaskkkkkkkkkkk : ",saveTask);
       let uploadedImages = [];
       if (images.length > 0) {
         const formData = new FormData();
-        images.forEach((img) => formData.append("images", img));
 
+        images.forEach((img) => formData.append("image_url", img));
         const imgResponse = await axios.post(
-          `${HOST_URL}/todo/${savedTask.id}/images`,
+          `${HOST_URL}/todo/${savedTask.id}/image_url`,
           formData
         );
 
         uploadedImages = imgResponse.data.images || [];
       }
-
       setTasks((prev) => [
         ...prev,
         { ...savedTask, images: uploadedImages },
       ]);
+
       navigate("/");
     } catch (err) {
       console.error("Error saving task:", err);
@@ -106,12 +104,14 @@ export function Add({ setTasks }) {
         </ul>
       )}
 
-      {/*<<<<<<--------------------change this for the input of the image ---------------------->>> */}
       <input
         type="file"
         accept="image/*"
         multiple
-        onChange={(e) => setImages(Array.from(e.target.files))}
+        onChange={(e) => {
+        const files = Array.from(e.target.files);
+        setImages(files);
+        }}
       />
 
       {images.length > 0 && (
