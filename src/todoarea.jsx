@@ -66,7 +66,7 @@ export function TodoArea() {
         `${BASE_URL}/todo/status`,
         { id }
       );
-
+      console.log("tasssssssssskkkkkkkkkk",tasks);
       setTasks((prev) =>
         prev.map((task) =>
           task.id === id ? { ...task, completed: true } : task
@@ -105,7 +105,7 @@ export function TodoArea() {
       />
 
       <div className="TodoGrid">
-        {tasks.map((task) => (
+        {tasks.length>0 && tasks.map((task) => (
           <div
             key={task.id}
             className={`TodoCard ${task.completed ? "completed" : ""} ${
