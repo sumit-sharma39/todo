@@ -15,10 +15,16 @@ export function TodoArea() {
 
   useEffect(() => {
     const getData = async () =>  {
+      try{
+        console.log("BASE_URL",BASE_URL);
       const result = await axios.get(`${BASE_URL}/data`);
        console.log("DATTTTTTTTTTTTTT",result)
       console.log("DATTTTTTTTTTTTTT",result.data.data)
       setTasks(result.data.data)
+      }
+      catch(e){
+        console.log("try catch Error ", e)
+      }
     }
       getData()
   }, []);
