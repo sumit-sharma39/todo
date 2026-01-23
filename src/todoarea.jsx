@@ -17,9 +17,10 @@ export function TodoArea() {
     const getData = async () =>  {
       try{
         console.log("BASE_URL",BASE_URL);
-      const result = await axios.get(`https://proficiently-bibliophagous-wilma.ngrok-free.dev/data`,{
+      const response  = await axios.get(`https://proficiently-bibliophagous-wilma.ngrok-free.dev/data`,{
     cache: "no-store",
   });
+   const result = await response.json();
        console.log("DATTTTTTTTTTTTTT",result)
       console.log("DATTTTTTTTTTTTTT",result.data.data)
       setTasks(result.data.data)
