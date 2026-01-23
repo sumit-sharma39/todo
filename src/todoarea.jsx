@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./todo.css";
 import { Dashboard } from "./dashboard";
-import { HOST_URL , BASE_URL } from "./config";
+import { HOST_URL  } from "./config";
 
 export function TodoArea() {
   const [tasks, setTasks] = useState([]);
@@ -16,7 +16,7 @@ export function TodoArea() {
   useEffect(() => {
     const getData = async () =>  {
       try{
-        console.log("BASE_URL",BASE_URL);
+        console.log("HOST_URL",HOST_URL);
       const response  = await axios.get(`https://proficiently-bibliophagous-wilma.ngrok-free.dev/data`,{
     cache: "no-store",
   });
@@ -57,7 +57,7 @@ export function TodoArea() {
     }
     axios
       .post(
-        `${BASE_URL}/delete`,
+        `${HOST_URL}/delete`,
         { ids: selectedTasks }
       )
       .then(() => {
@@ -73,7 +73,7 @@ export function TodoArea() {
   const updateTaskStatus = async (id) => {
     try {
       await axios.put(
-        `${BASE_URL}/todo/status`,
+        `${HOST_URL}/todo/status`,
         { id }
       );
       console.log("tasssssssssskkkkkkkkkk",tasks);

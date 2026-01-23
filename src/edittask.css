@@ -1,0 +1,148 @@
+/* ---------- PAGE WRAPPER ---------- */
+.AddPage {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.AddPage h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+/* ---------- INPUTS ---------- */
+.titlearea,
+.disparea,
+.deadlinearea,
+.bullet-row input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.titlearea:focus,
+.disparea:focus,
+.deadlinearea:focus,
+.bullet-row input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
+.disparea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* ---------- BULLET SECTION ---------- */
+.bullet-row {
+  display: flex;
+  gap: 10px;
+}
+
+.add-btn {
+  padding: 10px 16px;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.add-btn:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+/* ---------- BULLET LIST ---------- */
+.AddPage ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 20px;
+}
+
+.AddPage li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fafb;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.AddPage li button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #ef4444;
+}
+
+/* ---------- FILE INPUT ---------- */
+input[type="file"] {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* ---------- IMAGE PREVIEW ---------- */
+.image-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* ---------- SAVE / UPDATE BUTTON ---------- */
+.save-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 600px) {
+  .AddPage {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .bullet-row {
+    flex-direction: column;
+  }
+
+  .add-btn {
+    width: 100%;
+  }
+}

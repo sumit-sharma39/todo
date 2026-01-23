@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./taskdetail.css";
-import { BASE_URL } from "./config";
+import { HOST_URL } from "./config";
 
 export function TaskDetail() {
   const { id } = useParams();
@@ -15,10 +15,10 @@ export function TaskDetail() {
   useEffect(() => {
     async function fetchTask() {
       try {
-        const response = await axios.get(`${BASE_URL}/todo/${id}`);
+        const response = await axios.get(`${HOST_URL}/todo/${id}`);
         const data = response.data;
 
-        // ------------------ BULLETS ------------------
+        /* ---------------- BULLETS ---------------- */
         let bullets = [];
         if (Array.isArray(data.bullets)) bullets = data.bullets;
         else if (typeof data.bullets === "string") {
@@ -29,26 +29,29 @@ export function TaskDetail() {
           }
         }
 
-        // ------------------ IMAGES ------------------
+        /* ---------------- IMAGES ---------------- */
         let images = [];
         if (Array.isArray(data.image)) {
-          images = data.image; // DB column name is "image"
+          images = data.image;
         } else if (typeof data.image === "string") {
           try {
             const parsed = JSON.parse(data.image);
             if (Array.isArray(parsed)) images = parsed;
           } catch {
-            // Postgres array literal: {url1,url2}
             const match = data.image.match(/^\{(.*)\}$/);
             if (match) {
-              images = match[1].split(",").map((s) => s.replace(/"/g, "").trim());
+              images = match[1]
+                .split(",")
+                .map((s) => s.replace(/"/g, "").trim());
             }
           }
         }
 
-        // Filter only valid Cloudinary URLs
         images = images.filter(
-          (url) => typeof url === "string" && url.startsWith("http") && url.includes("cloudinary")
+          (url) =>
+            typeof url === "string" &&
+            url.startsWith("http") &&
+            url.includes("cloudinary")
         );
 
         setTask({
@@ -61,7 +64,7 @@ export function TaskDetail() {
 
         setLoading(false);
       } catch (err) {
-        console.error(" Error fetching task:", err);
+        console.error("Error fetching task:", err);
         setError(true);
         setLoading(false);
       }
@@ -87,17 +90,31 @@ export function TaskDetail() {
 
   return (
     <div className="TaskDetailPage">
-      <button className="back-btn" onClick={() => navigate(-1)}>
-        ← Back
-      </button>
+      {/* -------- HEADER ACTIONS -------- */}
+      <div className="task-actions">
+        <button className="back-btn" onClick={() => navigate(-1)}>
+          ← Back
+        </button>
+
+        <button
+          className="edit-btn"
+          onClick={() => navigate(`/edit/${id}`)}
+        >
+          ✏️ Edit
+        </button>
+      </div>
 
       <h2 className="task-title">{task.title}</h2>
 
       {task.deadline && (
-        <p className="task-deadline">Deadline: {formatDate(task.deadline)}</p>
+        <p className="task-deadline">
+          Deadline: {formatDate(task.deadline)}
+        </p>
       )}
 
-      {task.description && <p className="task-desc">{task.description}</p>}
+      {task.description && (
+        <p className="task-desc">{task.description}</p>
+      )}
 
       {task.bullets.length > 0 && (
         <ul className="task-bullets">
@@ -107,7 +124,7 @@ export function TaskDetail() {
         </ul>
       )}
 
-      {/* ------------------ IMAGES ------------------ */}
+      {/* -------- IMAGES -------- */}
       {task.images.length > 0 ? (
         <div className="image-grid">
           {task.images.map((img, i) => (

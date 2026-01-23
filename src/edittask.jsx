@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import "./add.css";
-import {HOST_URL } from "./config";
+import "./edittask.css";
+import { HOST_URL , BASE_URL } from "./config";
 
-export function Add({ setTasks }) {
+export default function EditTask({ setTasks }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [bulletInput, setBulletInput] = useState("");
@@ -12,56 +15,81 @@ export function Add({ setTasks }) {
   const [images, setImages] = useState([]);
   const [deadline, setDeadline] = useState("");
 
-  const navigate = useNavigate();
+  /* ---------------- FETCH TASK ---------------- */
+  useEffect(() => {
+    async function fetchTask() {
+      try {
+        // ✅ FIXED ROUTE
+        const res = await axios.get(`${HOST_URL}/todo/${id}`);
+        const task = res.data;
 
+        setTitle(task.title || "");
+        setDescription(task.description || "");
+        setBullets(task.bullets || []);
+        setDeadline(task.deadline || "");
+      } catch (err) {
+        console.error("Error fetching task:", err);
+      }
+    }
+
+    fetchTask();
+  }, [id]);
+
+  /* ---------------- BULLET HANDLER ---------------- */
   function addBullet() {
     if (!bulletInput.trim()) return;
     setBullets((prev) => [...prev, bulletInput]);
     setBulletInput("");
   }
 
-  async function saveTask() {
+  function removeBullet(index) {
+    setBullets((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  /* ---------------- UPDATE TASK ---------------- */
+  async function updateTask() {
     if (!title.trim()) return;
 
     try {
-      // only for saving the data of the task 
-    const response = await axios.post(`${HOST_URL}/add`, {
+      const response = await axios.put(`${HOST_URL}/tasks/${id}`, {
         title,
         description,
         bullets,
         deadline,
-        completed: false,
       });
 
-      //here goes the cloudinary imae url 
-      const savedTask = response.data;
-      // console.log("savetaskkkkkkkkkkk : ",saveTask);
+      const updatedTask = response.data.task;
+
       let uploadedImages = [];
       if (images.length > 0) {
         const formData = new FormData();
-
         images.forEach((img) => formData.append("image_url", img));
-        const imgResponse = await axios.post(
-          `${HOST_URL}/todo/${savedTask.id}/image_url`,
+
+        const imgRes = await axios.post(
+          `${HOST_URL}/todo/${id}/image_url`,
           formData
         );
 
-        uploadedImages = imgResponse.data.images || [];
+        uploadedImages = imgRes.data.images || [];
       }
-      setTasks((prev) => [
-        ...prev,
-        { ...savedTask, images: uploadedImages },
-      ]);
+
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === Number(id)
+            ? { ...updatedTask, images: uploadedImages }
+            : t
+        )
+      );
 
       navigate("/");
     } catch (err) {
-      console.error("Error saving task:", err);
+      console.error("Error updating task:", err);
     }
   }
 
   return (
     <div className="AddPage">
-      <h2>Add New Task</h2>
+      <h2>Edit Task</h2>
 
       <input
         className="titlearea"
@@ -99,7 +127,10 @@ export function Add({ setTasks }) {
       {bullets.length > 0 && (
         <ul>
           {bullets.map((b, i) => (
-            <li key={i}>{b}</li>
+            <li key={i}>
+              {b}
+              <button onClick={() => removeBullet(i)}>❌</button>
+            </li>
           ))}
         </ul>
       )}
@@ -108,10 +139,7 @@ export function Add({ setTasks }) {
         type="file"
         accept="image/*"
         multiple
-        onChange={(e) => {
-        const files = Array.from(e.target.files);
-        setImages(files);
-        }}
+        onChange={(e) => setImages(Array.from(e.target.files))}
       />
 
       {images.length > 0 && (
@@ -122,8 +150,8 @@ export function Add({ setTasks }) {
         </div>
       )}
 
-      <button className="save-btn" onClick={saveTask}>
-        Save Task
+      <button className="save-btn" onClick={updateTask}>
+        Update Task
       </button>
     </div>
   );
