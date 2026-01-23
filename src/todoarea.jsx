@@ -110,7 +110,7 @@ export function TodoArea() {
       
 
       <div className="TodoGrid">
-        {tasks.length>0 && tasks.map((task) => (
+        {tasks.map((task) => (
           <div
             key={task.id}
             className={`TodoCard ${task.completed ? "completed" : ""} ${
