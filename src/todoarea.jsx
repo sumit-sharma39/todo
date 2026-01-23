@@ -95,9 +95,7 @@ export function TodoArea() {
     navigate(`/task/${id}`);
   };
 
-  tasks.map((task) => {
-        console.log("tasks gained are ",task)
-  })
+
 
   return (
     <div>
@@ -110,7 +108,7 @@ export function TodoArea() {
       
 
       <div className="TodoGrid">
-        {tasks.map((task) => (
+        {tasks && tasks.map((task) => (
           <div
             key={task.id}
             className={`TodoCard ${task.completed ? "completed" : ""} ${
