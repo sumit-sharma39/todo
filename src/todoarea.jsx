@@ -16,7 +16,7 @@ export function TodoArea() {
   useEffect(() => {
     const getData = async () =>  {
     const result = await axios.get(`${BASE_URL}/data`);
-    console.log("DATTTTTTTTTTTTTT",result)
+    console.log("DATTTTTTTTTTTTTT",result.data.data)
     setTasks(result.data.data)
   }
   getData()
