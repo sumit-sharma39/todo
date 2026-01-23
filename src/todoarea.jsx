@@ -95,6 +95,10 @@ export function TodoArea() {
     navigate(`/task/${id}`);
   };
 
+  tasks.map((task) => {
+        console.log("tasks gained are ",task)
+  })
+
   return (
     <div>
       <Dashboard
@@ -103,6 +107,7 @@ export function TodoArea() {
         onDeleteSelected={deleteSelectedTasks}
         onCancel={cancelMultiDeleteMode}
       />
+      
 
       <div className="TodoGrid">
         {tasks.length>0 && tasks.map((task) => (
