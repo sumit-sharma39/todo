@@ -95,7 +95,7 @@ export function TodoArea() {
     navigate(`/task/${id}`);
   };
 
-
+  console.log("tasks are ", tasks);
 
   return (
     <div>
