@@ -20,7 +20,7 @@ export function TodoArea() {
       const response  = await axios.get(`https://proficiently-bibliophagous-wilma.ngrok-free.dev/data`,{
     cache: "no-store",
   });
-   const result = await response.json();
+   const result = await response.data;
        console.log("DATTTTTTTTTTTTTT",result)
       console.log("DATTTTTTTTTTTTTT",result.data.data)
       setTasks(result.data.data)
