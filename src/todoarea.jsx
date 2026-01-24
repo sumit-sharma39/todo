@@ -20,10 +20,8 @@ export function TodoArea() {
       const response  = await axios.get(`${BASE_URL_BACKEND}/data`,{
     cache: "no-store",
   });
-   const result = await response.data;
-       console.log("DATTTTTTTTTTTTTT",result)
-      console.log("D1",result.data)
-      setTasks(result.data)
+ 
+      setTasks(response.data)
       }
       catch(e){
         console.log("try catch Error ", e)
