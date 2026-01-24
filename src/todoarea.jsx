@@ -16,7 +16,7 @@ export function TodoArea() {
   useEffect(() => {
     const getData = async () =>  {
       try{
-        console.log("BASE_URL",BASE_URL);
+        console.log("BASE_URL = ",BASE_URL);
       const response  = await axios.get(`https://backend-todo-vx3m.onrender.com/data`,{
     cache: "no-store",
   });
