@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./add.css";
-import {BASE_URL } from "./config";
+import {BASE_URL_BACKEND } from "./config";
 
 export function Add({ setTasks }) {
   const [title, setTitle] = useState("");
@@ -25,7 +25,7 @@ export function Add({ setTasks }) {
 
     try {
       // only for saving the data of the task 
-    const response = await axios.post(`${BASE_URL}/add`, {
+    const response = await axios.post(`${BASE_URL_BACKEND}/add`, {
         title,
         description,
         bullets,
@@ -42,7 +42,7 @@ export function Add({ setTasks }) {
 
         images.forEach((img) => formData.append("image_url", img));
         const imgResponse = await axios.post(
-          `${BASE_URL}/todo/${savedTask.id}/image_url`,
+          `${BASE_URL_BACKEND}/todo/${savedTask.id}/image_url`,
           formData
         );
 

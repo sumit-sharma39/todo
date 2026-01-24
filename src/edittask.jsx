@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./edittask.css";
-import { BASE_URL  } from "./config";
+import { BASE_URL_BACKEND  } from "./config";
 
 export default function EditTask({ setTasks }) {
   const { id } = useParams();
@@ -20,7 +20,7 @@ export default function EditTask({ setTasks }) {
     async function fetchTask() {
       try {
 
-        const res = await axios.get(`${BASE_URL}/todo/${id}`);
+        const res = await axios.get(`${BASE_URL_BACKEND}/todo/${id}`);
         const task = res.data;
 
         setTitle(task.title || "");
@@ -51,7 +51,7 @@ export default function EditTask({ setTasks }) {
     if (!title.trim()) return;
 
     try {
-      const response = await axios.put(`${BASE_URL}/tasks/${id}`, {
+      const response = await axios.put(`${BASE_URL_BACKEND}/tasks/${id}`, {
         title,
         description,
         bullets,
@@ -66,7 +66,7 @@ export default function EditTask({ setTasks }) {
         images.forEach((img) => formData.append("image_url", img));
 
         const imgRes = await axios.post(
-          `${BASE_URL}/todo/${id}/image_url`,
+          `${BASE_URL_BACKEND}/todo/${id}/image_url`,
           formData
         );
 

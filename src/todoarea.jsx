@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./todo.css";
 import { Dashboard } from "./dashboard";
-import { BASE_URL  } from "./config";
+import { BASE_URL_BACKEND  } from "./config";
 
 export function TodoArea() {
   const [tasks, setTasks] = useState([]);
@@ -16,8 +16,8 @@ export function TodoArea() {
   useEffect(() => {
     const getData = async () =>  {
       try{
-        console.log("BASE_URL = ",BASE_URL);
-      const response  = await axios.get(`https://backend-todo-vx3m.onrender.com/data`,{
+        console.log("BASE_URL_BACKEND = ",BASE_URL_BACKEND);
+      const response  = await axios.get(`${BASE_URL_BACKEND}/data`,{
     cache: "no-store",
   });
    const result = await response.data;
@@ -57,7 +57,7 @@ export function TodoArea() {
     }
     axios
       .post(
-        `${BASE_URL}/delete`,
+        `${BASE_URL_BACKEND}/delete`,
         { ids: selectedTasks }
       )
       .then(() => {
@@ -73,7 +73,7 @@ export function TodoArea() {
   const updateTaskStatus = async (id) => {
     try {
       await axios.put(
-        `${BASE_URL}/todo/status`,
+        `${BASE_URL_BACKEND}/todo/status`,
         { id }
       );
       console.log("tasssssssssskkkkkkkkkk",tasks);
