@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./edittask.css";
-import { HOST_URL , BASE_URL } from "./config";
+import { BASE_URL  } from "./config";
 
 export default function EditTask({ setTasks }) {
   const { id } = useParams();
@@ -15,12 +15,12 @@ export default function EditTask({ setTasks }) {
   const [images, setImages] = useState([]);
   const [deadline, setDeadline] = useState("");
 
-  /* ---------------- FETCH TASK ---------------- */
+
   useEffect(() => {
     async function fetchTask() {
       try {
-        // ✅ FIXED ROUTE
-        const res = await axios.get(`${HOST_URL}/todo/${id}`);
+
+        const res = await axios.get(`${BASE_URL}/todo/${id}`);
         const task = res.data;
 
         setTitle(task.title || "");
@@ -35,7 +35,7 @@ export default function EditTask({ setTasks }) {
     fetchTask();
   }, [id]);
 
-  /* ---------------- BULLET HANDLER ---------------- */
+
   function addBullet() {
     if (!bulletInput.trim()) return;
     setBullets((prev) => [...prev, bulletInput]);
@@ -46,12 +46,12 @@ export default function EditTask({ setTasks }) {
     setBullets((prev) => prev.filter((_, i) => i !== index));
   }
 
-  /* ---------------- UPDATE TASK ---------------- */
+
   async function updateTask() {
     if (!title.trim()) return;
 
     try {
-      const response = await axios.put(`${HOST_URL}/tasks/${id}`, {
+      const response = await axios.put(`${BASE_URL}/tasks/${id}`, {
         title,
         description,
         bullets,
@@ -66,7 +66,7 @@ export default function EditTask({ setTasks }) {
         images.forEach((img) => formData.append("image_url", img));
 
         const imgRes = await axios.post(
-          `${HOST_URL}/todo/${id}/image_url`,
+          `${BASE_URL}/todo/${id}/image_url`,
           formData
         );
 
