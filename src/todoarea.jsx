@@ -17,7 +17,7 @@ export function TodoArea() {
     const getData = async () =>  {
       try{
         console.log("BASE_URL",BASE_URL);
-      const response  = await axios.get(`https://proficiently-bibliophagous-wilma.ngrok-free.dev/data`,{
+      const response  = await axios.get(`https://backend-todo-vx3m.onrender.com/data`,{
     cache: "no-store",
   });
    const result = await response.data;

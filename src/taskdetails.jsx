@@ -100,7 +100,7 @@ export function TaskDetail() {
           className="edit-btn"
           onClick={() => navigate(`/edit/${id}`)}
         >
-          ✏️ Edit
+          Edit
         </button>
       </div>
 
