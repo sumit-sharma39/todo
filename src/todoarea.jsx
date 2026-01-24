@@ -23,7 +23,7 @@ export function TodoArea() {
    const result = await response.data;
        console.log("DATTTTTTTTTTTTTT",result)
       console.log("D1",result.data)
-      setTasks(result.data.data)
+      setTasks(result.data)
       }
       catch(e){
         console.log("try catch Error ", e)
