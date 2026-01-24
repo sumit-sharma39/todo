@@ -22,7 +22,7 @@ export function TodoArea() {
   });
    const result = await response.data;
        console.log("DATTTTTTTTTTTTTT",result)
-      console.log("DATTTTTTTTTTTTTT",result.data)
+      console.log("D1",result.data)
       setTasks(result.data.data)
       }
       catch(e){
